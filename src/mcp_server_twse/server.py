@@ -5,10 +5,10 @@ from mcp.server.lowlevel import Server
 
 from .twse import query_stock_info
 
-app = Server("MCP Server TWSE")
+server: Server = Server("MCP Server TWSE")
 
 
-@app.list_tools()
+@server.list_tools()
 async def list_tools() -> list[types.Tool]:
     return [
         types.Tool(
@@ -28,7 +28,7 @@ async def list_tools() -> list[types.Tool]:
     ]
 
 
-@app.call_tool()
+@server.call_tool()
 async def query_tool(
     name: str, arguments: dict
 ) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
@@ -43,10 +43,10 @@ async def query_tool(
 
 async def run() -> None:
     async with mcp.server.stdio.stdio_server() as (read_stream, write_stream):
-        await app.run(
+        await server.run(
             read_stream,
             write_stream,
-            app.create_initialization_options(),
+            server.create_initialization_options(),
         )
 
 
