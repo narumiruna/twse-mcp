@@ -1,16 +1,16 @@
-# mcp-server-twse
+# TWSE MCP Server
 
 ### GitHub
 
 ```json
 {
   "mcpServers": {
-    "mcp-server-twse": {
+    "twsemcp": {
       "command": "uvx",
       "args": [
         "--from",
-        "git+https://github.com/narumiruna/mcp-server-twse",
-        "mcp-server-twse"
+        "git+https://github.com/narumiruna/twse-mcp",
+        "twsemcp"
       ]
     }
   }
@@ -22,13 +22,13 @@
 ```json
 {
   "mcpServers": {
-    "mcp-server-twse": {
+    "twsemcp": {
       "command": "uv",
       "args": [
         "run",
         "--directory",
-        "/home/<user>/workspace/mcp-server-twse",
-        "mcp-server-twse"
+        "/home/<user>/workspace/twse-mcp",
+        "twsemcp"
       ]
     }
   }
