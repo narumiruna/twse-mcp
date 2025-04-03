@@ -16,8 +16,7 @@ async def get_stock_info(
 ) -> str:
     """Get stock information from TWSE."""
     try:
-        StockInfoRequest(symbols)
-        result = await StockInfoRequest(symbols).do()
+        result = await StockInfoRequest(symbols=symbols).do()
         if full_info:
             return result.model_dump_json()
         else:
