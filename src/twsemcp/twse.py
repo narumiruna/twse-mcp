@@ -40,8 +40,8 @@ class StockInfo(BaseModel):
     market_percent: str | None = Field(None, validation_alias="m%")
     caret: str | None = Field(None, validation_alias="^")
     key: str | None = None
-    ask_prices: str | None = Field(None, validation_alias="a")  # "_" separated string
-    bid_prices: str | None = Field(None, validation_alias="b")  # "_" separated string
+    ask_prices: str | None = Field(None, validation_alias="a")
+    bid_prices: str | None = Field(None, validation_alias="b")
     symbol: str | None = Field(None, validation_alias="c")
     hash_id: str | None = Field(None, validation_alias="#")
     trade_date: str | None = Field(None, validation_alias="d")
@@ -49,8 +49,8 @@ class StockInfo(BaseModel):
     ticker: str | None = Field(None, validation_alias="ch")
     timestamp: str | None = Field(None, validation_alias="tlong")
     order_time: str | None = Field(None, validation_alias="ot")
-    ask_volumes: str | None = Field(None, validation_alias="f")  # "_" separated string
-    bid_volumes: str | None = Field(None, validation_alias="g")  # "_" separated string
+    ask_volumes: str | None = Field(None, validation_alias="f")
+    bid_volumes: str | None = Field(None, validation_alias="g")
     intraday_price: str | None = Field(None, validation_alias="ip")
     market_time: str | None = Field(None, validation_alias="mt")
     open_volume: str | None = Field(None, validation_alias="ov")
@@ -197,30 +197,24 @@ def build_ex_ch(symbols: list[str]) -> str:
     return "|".join(strings)
 
 
-def query_stock_info(symbols: str | list[str]) -> StockInfoResponse:
-    """Query real-time stock information from TWSE.
+class StockInfoRequest(BaseModel):
+    symbols: list[str] = Field(
+        default_factory=list,
+        description="List of stock symbols to query.",
+    )
 
-    Args:
-        symbols: Stock symbol(s) to query. Can be a single symbol string or list of symbols.
+    @property
+    def params(self) -> dict[str, Any]:
+        return {
+            "ex_ch": build_ex_ch(self.symbols),
+            "json": 1,
+            "delay": 0,
+            "_": int(time.time() * 1000),
+        }
 
-    Returns:
-        StockInfoResponse containing the queried stock information.
-
-    Raises:
-        httpx.HTTPError: If the API request fails.
-    """
-    if isinstance(symbols, str):
-        symbols = [symbols]
-
-    params: dict[str, Any] = {
-        "ex_ch": build_ex_ch(symbols),
-        "json": 1,
-        "delay": 0,
-        "_": int(time.time() * 1000),
-    }
-
-    url = "https://mis.twse.com.tw/stock/api/getStockInfo.jsp"
-    resp = httpx.get(url, params=params)
-    resp.raise_for_status()
-
-    return StockInfoResponse.model_validate(resp.json())
+    async def do(self) -> StockInfoResponse:
+        url = "https://mis.twse.com.tw/stock/api/getStockInfo.jsp"
+        async with httpx.AsyncClient() as client:
+            resp = await client.get(url, params=self.params)
+            resp.raise_for_status()
+            return StockInfoResponse.model_validate(resp.json())

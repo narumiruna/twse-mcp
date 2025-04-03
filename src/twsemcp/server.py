@@ -3,20 +3,25 @@ from typing import Annotated
 from mcp.server.fastmcp import FastMCP
 from pydantic import Field
 
-from .twse import query_stock_info
+from twsemcp.twse import StockInfoRequest
 
 # https://github.com/jlowin/fastmcp/issues/81#issuecomment-2714245145
-server = FastMCP("MCP Server TWSE", log_level="ERROR")
+server = FastMCP("TWSE MCP Server", log_level="ERROR")
 
 
 @server.tool()
-async def query_stock_info_from_twse(
-    symbol: Annotated[str, Field(description="The Taiwan stock symbol to query. e.q. 2330")],
+async def get_stock_info(
+    symbols: Annotated[list[str], Field(description="List of stock symbols to query, e.g., ['2330', '2317']")],
+    full_info: Annotated[bool, Field(description="Whether to return full information or not.")] = True,
 ) -> str:
-    """Query stock information from TWSE."""
+    """Get stock information from TWSE."""
     try:
-        result = query_stock_info(symbol)
-        return result.pretty_repr()
+        StockInfoRequest(symbols)
+        result = await StockInfoRequest(symbols).do()
+        if full_info:
+            return result.model_dump_json()
+        else:
+            return result.pretty_repr()
     except Exception as e:
         return f"Error occurred while querying stock information: {str(e)}"
 
