@@ -1,5 +1,3 @@
-import json
-
 import pytest
 from mcp import ClientSession
 from mcp import StdioServerParameters
