@@ -3,8 +3,7 @@ from mcp import ClientSession
 from mcp import StdioServerParameters
 from mcp import stdio_client
 from mcp.types import TextContent
-
-from twsemcp.twse import StockInfoResponse
+from twse.stock_info import StockInfoResponse
 
 
 @pytest.fixture
