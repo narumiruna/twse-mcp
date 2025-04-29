@@ -10,7 +10,7 @@ server = FastMCP("TWSE MCP Server", log_level="ERROR")
 
 @server.tool()
 async def get_stock_info(
-    symbols: Annotated[list[str], Field(description="List of stock symbols to query, e.g., ['2330', '2317']")],
+    symbols: Annotated[list[str], Field(description="List of stock symbols to query, e.g., ['2330', '006208']")],
 ) -> str:
     """Get stock information from TWSE."""
     try:
